@@ -1,26 +1,65 @@
-export type CatActionState = 
-  | 'corner_solving'     // Знаменитая поза в углу как на фото
-  | 'inspecting_wall'    // Рассматривает формулу на стене
-  | 'inspecting_floor'   // Рассматривает формулы на полу
-  | 'walking'            // Идет к новой формуле или цели
-  | 'sitting'            // Спокойно сидит и размышляет
-  | 'purring';           // Мурлычет, когда погладили
+export type CharacterId =
+  | 'red_ai'
+  | 'fly_immortal'
+  | 'pink_node'
+  | 'blue_quantum'
+  | 'green_sprout'
+  | 'golden_coin'
+  | 'white_cloud';
 
-export type CameraViewPreset = 
-  | 'corner_meme'        // Ракурс точь-в-точь как на фото (из-за спины в угол)
-  | 'follow_cat'         // Камера плавно следует за котом
-  | 'room_wide'          // Широкий кинематографичный обзор всей комнаты
-  | 'wall_left'          // Крупный план левой стены (оптика, линзы)
-  | 'wall_right';        // Крупный план правой стены (интегралы освещенности)
+export type CharacterAction =
+  | 'idle'
+  | 'walking'
+  | 'flying'
+  | 'talking'
+  | 'working'
+  | 'celebrating';
 
-export type RoomTheme = 'classic_paper' | 'warm' | 'neon_glow' | 'dark_chalk';
+export type TimeOfDay = 'day' | 'sunset' | 'night';
 
-export interface FormulaPoint {
+export type CameraMode =
+  | 'square_overview'
+  | 'follow_red_ai'
+  | 'follow_fly'
+  | 'follow_pink_node'
+  | 'follow_blue_quantum'
+  | 'follow_green_sprout'
+  | 'follow_golden_coin'
+  | 'follow_white_cloud';
+
+export interface CharacterDialogue {
+  speakerId: CharacterId;
+  textZh: string;
+  durationMs?: number;
+}
+
+export interface ConversationThread {
   id: string;
-  name: string;
-  category: 'optics' | 'calculus' | 'quantum' | 'corner';
-  position: [number, number, number]; // x, y, z в 3D
-  lookAt: [number, number, number];
-  thought: string;
-  formulaLatex: string;
+  participants: CharacterId[];
+  locationNameZh: string;
+  lines: CharacterDialogue[];
+}
+
+export interface TownPoi {
+  id: string;
+  nameZh: string;
+  position: [number, number, number];
+  descriptionZh: string;
+  poiType: 'fountain' | 'cafe' | 'lab' | 'bakery' | 'clock_tower' | 'park' | 'garden';
+}
+
+export interface ActiveSpeechBubble {
+  speakerId: CharacterId;
+  textZh: string;
+}
+
+export interface CharacterProfile {
+  id: CharacterId;
+  nameZh: string;
+  roleZh: string;
+  tagZh: string;
+  themeColor: string;
+  accentColor: string;
+  avatarBg: string;
+  defaultTaskZh: string;
 }

@@ -1,180 +1,219 @@
-// Web Audio API Procedural Sound Engine for Cat in Formula Room
+// Процедурный синтезатор звуков для городка (Web Audio API)
+import { CharacterId } from './types';
 
-class CatSoundSystem {
+class TownSoundEngine {
   private ctx: AudioContext | null = null;
   public isMuted: boolean = false;
 
-  private init() {
-    if (!this.ctx) {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  private initContext() {
+    if (!this.ctx && typeof window !== 'undefined') {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       this.ctx = new AudioContextClass();
     }
-    if (this.ctx.state === 'suspended') {
+    if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
   }
 
-  // Мягкий топот подушечек лап
-  public playPawStep() {
+  // Звук шага
+  public playStep(pitch: number = 1.0) {
     if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    const t = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
-
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(320, t);
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(80 + Math.random() * 25, t);
-    osc.frequency.exponentialRampToValueAtTime(35, t + 0.06);
-
-    gain.gain.setValueAtTime(0.045, t);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(t);
-    osc.stop(t + 0.08);
-  }
-
-  // Настоящее кошачье мурлыканье (вибрация 25-30 Гц)
-  public playPurr(duration = 2.0) {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    const t = this.ctx.currentTime;
-    const lfo = this.ctx.createOscillator();
-    const lfoGain = this.ctx.createGain();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
-
-    lfo.frequency.setValueAtTime(26, t); // частота мурлыканья
-    lfoGain.gain.setValueAtTime(18, t);
-    lfo.connect(osc.frequency);
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(55, t);
-
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(140, t);
-
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.linearRampToValueAtTime(0.08, t + 0.3);
-    gain.gain.setValueAtTime(0.08, t + duration - 0.4);
-    gain.gain.linearRampToValueAtTime(0.0001, t + duration);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    lfo.start(t);
-    osc.start(t);
-    lfo.stop(t + duration);
-    osc.stop(t + duration);
-  }
-
-  // Мягкое мяуканье при клике на кота
-  public playMeow() {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    const t = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
-
-    osc.type = 'sawtooth';
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(700, t);
-    filter.Q.setValueAtTime(3.5, t);
-
-    // Характерная траектория мяу: подъем и плавный спад
-    osc.frequency.setValueAtTime(340, t);
-    osc.frequency.exponentialRampToValueAtTime(580, t + 0.12);
-    osc.frequency.exponentialRampToValueAtTime(360, t + 0.45);
-
-    gain.gain.setValueAtTime(0.001, t);
-    gain.gain.linearRampToValueAtTime(0.05, t + 0.08);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.48);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(t);
-    osc.stop(t + 0.5);
-  }
-
-  // Звук математического озарения / решения формулы
-  public playInsight() {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    const t = this.ctx.currentTime;
-    const freqs = [523.25, 659.25, 783.99, 1046.5]; // C5 - E5 - G5 - C6
-    freqs.forEach((f, idx) => {
+    try {
+      this.initContext();
       if (!this.ctx) return;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      const delay = idx * 0.06;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140 * pitch, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(45 * pitch, this.ctx.currentTime + 0.08);
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(f, t + delay);
-
-      gain.gain.setValueAtTime(0.0001, t + delay);
-      gain.gain.linearRampToValueAtTime(0.03, t + delay + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + delay + 0.6);
+      gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.08);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
-
-      osc.start(t + delay);
-      osc.stop(t + delay + 0.65);
-    });
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.09);
+    } catch {
+      // Audio safety
+    }
   }
 
-  // Звук шуршания мела по доске / карандаша по бумаге
-  public playChalkScritch() {
+  // Звук жужжания крыльев Мухи (永生)
+  public playFlyFlap() {
     if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(260, this.ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(340, this.ctx.currentTime + 0.06);
+      osc.frequency.linearRampToValueAtTime(240, this.ctx.currentTime + 0.12);
 
-    const t = this.ctx.currentTime;
-    const bufferSize = this.ctx.sampleRate * 0.15;
-    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.4));
+      gain.gain.setValueAtTime(0.025, this.ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.0001, this.ctx.currentTime + 0.12);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.13);
+    } catch {
+      // safety
     }
+  }
 
-    const noise = this.ctx.createBufferSource();
-    noise.buffer = buffer;
+  // Голос персонажа (милый стиль речи для каждого из 7 персонажей)
+  public playVoice(characterId: CharacterId) {
+    if (this.isMuted) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
 
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(1800, t);
-    filter.Q.setValueAtTime(2.0, t);
+      let baseFreq = 440;
+      let waveType: OscillatorType = 'sine';
 
-    const gain = this.ctx.createGain();
-    gain.gain.setValueAtTime(0.03, t);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+      switch (characterId) {
+        case 'red_ai':
+          baseFreq = 220;
+          waveType = 'square';
+          break;
+        case 'fly_immortal':
+          baseFreq = 680;
+          waveType = 'sawtooth';
+          break;
+        case 'pink_node':
+          baseFreq = 440;
+          waveType = 'sine';
+          break;
+        case 'blue_quantum':
+          baseFreq = 580;
+          waveType = 'triangle';
+          break;
+        case 'green_sprout':
+          baseFreq = 520;
+          waveType = 'sine';
+          break;
+        case 'golden_coin':
+          baseFreq = 760;
+          waveType = 'sine';
+          break;
+        case 'white_cloud':
+          baseFreq = 340;
+          waveType = 'triangle';
+          break;
+      }
 
-    noise.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.ctx.destination);
+      const syllables = 3;
 
-    noise.start(t);
+      for (let i = 0; i < syllables; i++) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const t = now + i * 0.07;
+        const pitch = baseFreq + (Math.random() - 0.5) * 60;
+
+        osc.type = waveType;
+        osc.frequency.setValueAtTime(pitch, t);
+        osc.frequency.linearRampToValueAtTime(pitch + 40, t + 0.05);
+
+        const vol = waveType === 'square' ? 0.03 : 0.06;
+        gain.gain.setValueAtTime(vol, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.07);
+      }
+    } catch {
+      // safety
+    }
+  }
+
+  // Звон колокола на башне городка
+  public playTownBell() {
+    if (this.isMuted) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+
+      const freqs = [587.33, 880, 1174.66, 1760];
+      freqs.forEach((freq, idx) => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+
+        const volume = 0.15 / (idx + 1);
+        gain.gain.setValueAtTime(volume, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.2 - idx * 0.3);
+
+        osc.connect(gain);
+        gain.connect(this.ctx!.destination);
+        osc.start(now);
+        osc.stop(now + 2.5);
+      });
+    } catch {
+      // safety
+    }
+  }
+
+  // Звук радостного подпрыгивания (клик по персонажу)
+  public playBoing() {
+    if (this.isMuted) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + 0.22);
+
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.26);
+    } catch {
+      // safety
+    }
+  }
+
+  // Всплеск фонтана / брызги
+  public playSplash() {
+    if (this.isMuted) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(750, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.18);
+
+      gain.gain.setValueAtTime(0.07, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    } catch {
+      // safety
+    }
   }
 }
 
-export const catSounds = new CatSoundSystem();
+export const townSounds = new TownSoundEngine();
