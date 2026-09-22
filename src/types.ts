@@ -1,65 +1,66 @@
-export type CharacterId =
-  | 'red_ai'
-  | 'fly_immortal'
-  | 'pink_node'
-  | 'blue_quantum'
-  | 'green_sprout'
-  | 'golden_coin'
-  | 'white_cloud';
+export type Language = 'ru' | 'en' | 'zh';
 
-export type CharacterAction =
-  | 'idle'
-  | 'walking'
-  | 'flying'
-  | 'talking'
-  | 'working'
-  | 'celebrating';
-
-export type TimeOfDay = 'day' | 'sunset' | 'night';
-
-export type CameraMode =
-  | 'square_overview'
-  | 'follow_red_ai'
-  | 'follow_fly'
-  | 'follow_pink_node'
-  | 'follow_blue_quantum'
-  | 'follow_green_sprout'
-  | 'follow_golden_coin'
-  | 'follow_white_cloud';
-
-export interface CharacterDialogue {
-  speakerId: CharacterId;
-  textZh: string;
-  durationMs?: number;
+export interface TokenInfo {
+  name: string;
+  symbol: string;
+  chain: string;
+  contractAddress: string;
+  totalSupply: string;
+  tax: string;
+  liquidity: string;
+  dexUrl: string;
+  chartUrl: string;
+  explorerUrl: string;
+  telegramUrl: string;
+  twitterUrl: string;
+  geniusUrl: string;
 }
 
-export interface ConversationThread {
+export interface TradeQuote {
   id: string;
-  participants: CharacterId[];
-  locationNameZh: string;
-  lines: CharacterDialogue[];
+  text: string;
+  multiplier: string;
+  tag: string;
 }
 
-export interface TownPoi {
+export interface MemeItem {
   id: string;
-  nameZh: string;
-  position: [number, number, number];
-  descriptionZh: string;
-  poiType: 'fountain' | 'cafe' | 'lab' | 'bakery' | 'clock_tower' | 'park' | 'garden';
+  title: string;
+  tagline: string;
+  gesture: string;
+  badge: string;
 }
 
-export interface ActiveSpeechBubble {
-  speakerId: CharacterId;
-  textZh: string;
+export interface FaqItem {
+  question: string;
+  answer: string;
 }
 
-export interface CharacterProfile {
-  id: CharacterId;
-  nameZh: string;
-  roleZh: string;
-  tagZh: string;
-  themeColor: string;
-  accentColor: string;
-  avatarBg: string;
-  defaultTaskZh: string;
+export type FormulaCategory =
+  | 'feline_physics'
+  | 'quantum'
+  | 'relativity'
+  | 'math'
+  | 'cosmology';
+
+export interface FormulaItem {
+  id: string;
+  category: FormulaCategory;
+  categoryLabel: string;
+  title: string;
+  latex: string;
+  explanation: string;
+  catThought: string;
+  catMemeQuote: string;
+  chalkColor?: 'white' | 'yellow' | 'cyan' | 'pink' | 'orange';
+  difficultyStars: number;
+  subNotes?: string[];
+}
+
+export type CatMood = 'philosophical' | 'curious' | 'genius' | 'sleepy' | 'hungry';
+
+export interface ChalkStroke {
+  points: { x: number; y: number }[];
+  color: string;
+  width: number;
 }

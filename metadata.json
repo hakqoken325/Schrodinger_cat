@@ -1,6 +1,6 @@
 {
-  "name": "Crypto Miner Trader 3D",
-  "description": "3D微型互动小镇：包含小AI、永生苍蝇、粉色节点、量子小蓝、萌芽园丁、金灿灿、云朵大厨等7位可爱居民。居民们在小镇中各自工作、散步、相遇并展开生动幽默的对话交流。",
+  "name": "Infinity Runner",
+  "description": "sixmeme ($SIX) — Genius 交易平台专属文化 Meme 代币，以标志性 6 手势 (🤙 / 666) 为核心，致敬天才级交易与无上信仰。",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

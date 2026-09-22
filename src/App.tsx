@@ -1,90 +1,67 @@
-import React, { useState, useCallback } from 'react';
-import { Town3DScene } from './components/Town3DScene';
-import { TownHUD } from './components/TownHUD';
-import { CameraMode, TimeOfDay, CharacterId, ActiveSpeechBubble } from './types';
-import { IDLE_THOUGHTS } from './data';
-import { townSounds } from './sound';
+import React, { useState, useEffect } from 'react';
+import { Language } from './types';
+import { Navbar } from './components/Navbar';
+import { HeroSection } from './components/HeroSection';
+import { WhySixSection } from './components/WhySixSection';
+import { InteractiveTerminal } from './components/InteractiveTerminal';
+import { TokenomicsSection } from './components/TokenomicsSection';
+import { HowToBuySection } from './components/HowToBuySection';
+import { MemeGallerySection } from './components/MemeGallerySection';
+import { FaqSection } from './components/FaqSection';
+import { Footer } from './components/Footer';
+import { cyberAudio } from './utils/cyberAudio';
 
 export default function App() {
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('day');
-  const [cameraMode, setCameraMode] = useState<CameraMode>('square_overview');
-  const [gatherAllTrigger, setGatherAllTrigger] = useState(0);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId | null>(null);
+  const [lang, setLang] = useState<Language>('zh');
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
-  const [activeSpeech, setActiveSpeech] = useState<ActiveSpeechBubble | null>(null);
-  const [chatHistory, setChatHistory] = useState<
-    { speakerId: CharacterId; textZh: string; time: string }[]
-  >([]);
+  // Sync sound engine state
+  useEffect(() => {
+    cyberAudio.setMuted(!soundEnabled);
+  }, [soundEnabled]);
 
-  // Обработка новой реплики
-  const handleSpeechBubble = useCallback((speech: ActiveSpeechBubble) => {
-    setActiveSpeech(speech);
-
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-    setChatHistory((prev) => [
-      { ...speech, time: timeStr },
-      ...prev.slice(0, 30) // храним последние 30 реплик
-    ]);
-
-    // Автоматическое скрытие речевого облачка через 4.5 секунды
-    setTimeout(() => {
-      setActiveSpeech((curr) => (curr?.textZh === speech.textZh ? null : curr));
-    }, 4500);
-  }, []);
-
-  // Собрать всех жителей городка на площади
-  const handleGatherAll = () => {
-    setGatherAllTrigger((prev) => prev + 1);
-    setCameraMode('square_overview');
-    setSelectedCharacterId(null);
-  };
-
-  // Клик по персонажу в 3D сцене
-  const handleCharacterClick = (id: CharacterId) => {
-    setSelectedCharacterId(id);
-  };
-
-  // Интерактивное приветствие с персонажем
-  const handlePokeCharacter = (id: CharacterId) => {
-    townSounds.playBoing();
-    townSounds.playVoice(id);
-
-    const thoughts = IDLE_THOUGHTS[id];
-    if (thoughts && thoughts.length > 0) {
-      const thought = thoughts[Math.floor(Math.random() * thoughts.length)];
-      handleSpeechBubble({
-        speakerId: id,
-        textZh: thought
-      });
-    }
+  const handleToggleSound = () => {
+    const next = !soundEnabled;
+    setSoundEnabled(next);
+    cyberAudio.setMuted(!next);
   };
 
   return (
-    <div className="w-screen h-screen relative bg-slate-950 overflow-hidden select-none font-sans">
-      {/* 3D Интерактивный Городок с 7 персонажами */}
-      <Town3DScene
-        timeOfDay={timeOfDay}
-        cameraMode={cameraMode}
-        onCharacterClick={handleCharacterClick}
-        onSpeechBubble={handleSpeechBubble}
-        gatherAllTrigger={gatherAllTrigger}
+    <div className="min-h-screen bg-[#07080d] text-slate-100 flex flex-col font-sans selection:bg-[#ff2d8d] selection:text-white">
+      {/* Top Navbar */}
+      <Navbar
+        lang={lang}
+        onSelectLang={setLang}
+        soundEnabled={soundEnabled}
+        onToggleSound={handleToggleSound}
       />
 
-      {/* Удобный интерфейс управления и диалогов на китайском упрощенном */}
-      <TownHUD
-        timeOfDay={timeOfDay}
-        onTimeOfDayChange={setTimeOfDay}
-        cameraMode={cameraMode}
-        onCameraModeChange={setCameraMode}
-        onGatherAll={handleGatherAll}
-        activeSpeech={activeSpeech}
-        chatHistory={chatHistory}
-        selectedCharacterId={selectedCharacterId}
-        onSelectCharacter={setSelectedCharacterId}
-        onPokeCharacter={handlePokeCharacter}
-      />
+      {/* Main Content Sections */}
+      <main className="flex-1 w-full">
+        {/* 1. Hero Section: 3D Gesture, CA copy, Live Stats */}
+        <HeroSection lang={lang} />
+
+        {/* 2. The Lore: Why the number 6 & Genius Platform Synergy */}
+        <WhySixSection lang={lang} />
+
+        {/* 3. Interactive Alpha Simulator: Throw the 6, Earn IQ, Live Trades Feed */}
+        <InteractiveTerminal lang={lang} />
+
+        {/* 4. Tokenomics: 6-Nomics (666M, 0/0 Tax, 100% LP) */}
+        <TokenomicsSection lang={lang} />
+
+        {/* 5. How To Buy: 4 Smooth Visual Steps */}
+        <HowToBuySection lang={lang} />
+
+        {/* 6. Meme Gallery / Wall of Fame */}
+        <MemeGallerySection lang={lang} />
+
+        {/* 7. FAQ Section */}
+        <FaqSection lang={lang} />
+      </main>
+
+      {/* Footer */}
+      <Footer lang={lang} />
     </div>
   );
 }

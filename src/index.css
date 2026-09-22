@@ -6,20 +6,90 @@
   }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.font-display {
+  font-family: 'Syne', system-ui, -apple-system, sans-serif;
 }
 
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-out forwards;
+/* Neon Pink Glow Utilities */
+.neon-pink-text {
+  color: #ff3399;
+  text-shadow: 0 0 10px rgba(255, 45, 141, 0.7), 0 0 20px rgba(255, 45, 141, 0.4), 0 0 40px rgba(255, 45, 141, 0.2);
 }
 
-.animate-scaleUp {
-  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.neon-pink-glow {
+  box-shadow: 0 0 25px -5px rgba(255, 45, 141, 0.4), 0 0 50px -10px rgba(255, 45, 141, 0.2);
+}
+
+.neon-pink-glow-sm {
+  box-shadow: 0 0 15px -3px rgba(255, 45, 141, 0.35);
+}
+
+.neon-pink-border {
+  border-color: rgba(255, 45, 141, 0.4);
+}
+
+.neon-pink-border:hover {
+  border-color: rgba(255, 45, 141, 0.8);
+  box-shadow: 0 0 20px rgba(255, 45, 141, 0.25);
+}
+
+/* Background Cyber Grid */
+.cyber-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 45, 141, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 45, 141, 0.05) 1px, transparent 1px);
+}
+
+.cyber-dots {
+  background-image: radial-gradient(rgba(255, 45, 141, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.03);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+.animate-float {
+  animation: floatSlow 5s ease-in-out infinite;
+}
+
+/* Cyber dark scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080910;
+}
+::-webkit-scrollbar-thumb {
+  background: #25283d;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff2d8d;
 }
